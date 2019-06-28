@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, AnyStr
+from typing import AnyStr, Dict
 
 from cafeteria.logging import LoggedObject
 
@@ -22,5 +24,5 @@ class FreshChatHeaders(LoggedObject):
     Authorization: str = ""
 
     @classmethod
-    def load(cls, data: Dict[AnyStr, AnyStr]) -> "FreshChatHeaders":
+    def load(cls, data: Dict[AnyStr, AnyStr]) -> FreshChatHeaders:
         return cls(Authorization=f"Bearer {data.get('Authorization')}")

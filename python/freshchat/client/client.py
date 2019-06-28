@@ -1,24 +1,15 @@
 import os
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from enum import Enum
-from http import HTTPStatus
-from typing import AnyStr, Any, Dict, List
+from typing import Any, AnyStr, Dict, List
 from urllib.parse import urljoin
 
 import aiohttp
 from cafeteria.logging import LoggedObject
 
-from freshchat.liveagent.chat.exceptions import (
-    FreshChatBadRequest,
-    ResourceNotFound,
-    ServerSideError,
-    FreshChatUnauthorised,
-    FreshChatForbidden,
-    TooManyRequests,
-    ServerUnavailable,
-)
-from freshchat.liveagent.chat.headers import FreshChatHeaders
-from freshchat.liveagent.chat.responses import FreshChatResponse
+from python.freshchat.client.exceptions import raise_error_on_bad_response
+from python.freshchat.client.headers import FreshChatHeaders
+from python.freshchat.client.responses import FreshChatResponse
 
 
 class Operation(Enum):
@@ -46,7 +37,7 @@ class FreshChatConfiguration:
         else:
             return f"https://api.freshchat.com/v2/users"
 
-    def get_url(self, *extras: List[Any]):
+    def get_url(self, *extras: str):
         """
         Method responsible to build the url using the given extras if exists
 
@@ -54,7 +45,10 @@ class FreshChatConfiguration:
         :return: URL
         """
         return (
-            urljoin(self.url_prefix, "/".join(extras).lstrip("/").lstrip("/"))
+            urljoin(
+                self.url_prefix,
+                "/".join(str(x) for x in extras).lstrip("/").lstrip("/"),
+            )
             if extras
             else self.url_prefix
         )
@@ -117,37 +111,12 @@ class FreshChatClient(LoggedObject):
                 json=body,
                 headers=request_headers,
             ) as response:
-                print(await response.json())
                 response = await FreshChatResponse.load(response)
                 self.logger.debug(
                     "%s %s %d \n< %s", method, url, response.http.status, response.body
                 )
 
-                if response.http.status == HTTPStatus.BAD_REQUEST:
-                    raise FreshChatBadRequest(
-                        message=response.body, response=response.http
-                    )
-                elif response.http.status == HTTPStatus.NOT_FOUND:
-                    raise ResourceNotFound(
-                        message=response.body, response=response.http
-                    )
-                elif response.http.status == HTTPStatus.INTERNAL_SERVER_ERROR:
-                    raise ServerSideError(message=response.body, response=response.http)
-                elif response.http.status == HTTPStatus.UNAUTHORIZED:
-                    raise FreshChatUnauthorised(
-                        message=response.body, response=response.http
-                    )
-                elif response.http.status == HTTPStatus.FORBIDDEN:
-                    raise FreshChatForbidden(
-                        message=response.body, response=response.http
-                    )
-                elif response.http.status == HTTPStatus.TOO_MANY_REQUESTS:
-                    raise TooManyRequests(message=response.body, response=response.http)
-                elif response.http.status == HTTPStatus.SERVICE_UNAVAILABLE:
-                    raise ServerUnavailable(
-                        message=response.body, response=response.http
-                    )
-                return response
+                return raise_error_on_bad_response(response)
 
     async def get(
         self,

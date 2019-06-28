@@ -1,6 +1,9 @@
+from http import HTTPStatus
+from typing import Dict, Type
+
 from aiohttp import ClientResponse
 
-from freshchat.liveagent.chat.responses import FreshChatResponseBody
+from python.freshchat.client.responses import FreshChatResponse, FreshChatResponseBody
 
 
 class FreshChatClientException(Exception):
@@ -65,3 +68,23 @@ class ServerSideError(FreshChatClientException):
 
 class Conflict(FreshChatClientException):
     DEFAULT_MESSAGE = "The request causes data inconsistencies"
+
+
+RESPONSE_CODE_TO_ERROR_MAPPING: Dict[int, Type[FreshChatClientException]] = {
+    HTTPStatus.BAD_REQUEST: FreshChatBadRequest,
+    HTTPStatus.NOT_FOUND: ResourceNotFound,
+    HTTPStatus.INTERNAL_SERVER_ERROR: ServerSideError,
+    HTTPStatus.UNAUTHORIZED: FreshChatUnauthorised,
+    HTTPStatus.FORBIDDEN: FreshChatForbidden,
+    HTTPStatus.TOO_MANY_REQUESTS: TooManyRequests,
+    HTTPStatus.SERVICE_UNAVAILABLE: ServerUnavailable,
+    HTTPStatus.CONFLICT: Conflict,
+}
+
+
+def raise_error_on_bad_response(response: FreshChatResponse) -> FreshChatResponse:
+    try:
+        error = RESPONSE_CODE_TO_ERROR_MAPPING[response.http.status]
+        raise error(message=response.body, response=response.http)
+    except KeyError:
+        return response

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 from json import JSONDecodeError
 from typing import Union, Dict, AnyStr, Any
@@ -30,7 +32,7 @@ class FreshChatResponse:
             return body
 
     @classmethod
-    async def load(cls, response: ClientResponse) -> "FreshChatResponse":
+    async def load(cls, response: ClientResponse) -> FreshChatResponse:
         if response.content_type != "application/json":
             return cls(response, await response.text())
         return cls(response, await response.json(loads=cls._decode))

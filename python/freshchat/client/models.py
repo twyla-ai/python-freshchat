@@ -1,10 +1,10 @@
 import functools
 from dataclasses import asdict, dataclass, field
-from typing import Any, AnyStr, Dict, List, Optional
+from typing import Any, AnyStr, Dict, List
 
 from cafeteria.logging import LoggedObject
 
-from freshchat.liveagent.chat.client import Operation, FreshChatClient
+from python.freshchat.client.client import FreshChatClient, Operation
 
 
 @dataclass
@@ -14,12 +14,12 @@ class User:
     agent
     """
 
-    id: Optional[str] = field(default=None)
+    id: str = None
     created_time: str = None
     email: str = None
     first_name: str = None
     last_name: str = None
-    phone: str = ""
+    phone: str = None
     avatar: Dict[AnyStr, AnyStr] = field(default_factory=dict)
     social_profiles: List[Dict[AnyStr, AnyStr]] = field(default_factory=list)
     properties: List[Dict[AnyStr, AnyStr]] = field(default_factory=list)
@@ -92,7 +92,7 @@ class Channels:
     value of get channels request
     """
 
-    channels: List[Channel] = field(default_factory=Channel)
+    channels: List[Channel] = field(default_factory=list)
     pagination: Dict[AnyStr, AnyStr] = field(default_factory=dict)
     links: Dict[AnyStr, AnyStr] = field(default_factory=dict)
     last_page: Dict[AnyStr, AnyStr] = field(default_factory=dict)

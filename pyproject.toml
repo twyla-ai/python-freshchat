@@ -21,7 +21,7 @@ exclude = '''
 '''
 
 [tool.poetry]
-name = "freshchat-liveagent-chat"
+name = "python-freshchat-client"
 version = "0.1.0-dev"
 description = "A library provide a http client for Freshchat API"
 authors = [
@@ -31,7 +31,7 @@ license = "Proprietary"
 
 readme = "README.md"
 
-repository = "https://github.com/twyla-ai/freshchat-liveagent-chat"
+repository = "https://github.com/twyla-ai/python-freshchat-client"
 
 keywords = []
 
