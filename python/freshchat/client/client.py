@@ -1,7 +1,6 @@
 import os
-from dataclasses import asdict, dataclass
-from enum import Enum
-from typing import Any, AnyStr, Dict, List
+from dataclasses import asdict, dataclass, field
+from typing import Any, AnyStr, Dict, List, Union
 from urllib.parse import urljoin
 
 import aiohttp
@@ -11,8 +10,11 @@ from python.freshchat.client.exceptions import raise_error_on_bad_response
 from python.freshchat.client.headers import FreshChatHeaders
 from python.freshchat.client.responses import FreshChatResponse
 
+CONVERSATION_INITIAL_MESSAGE = "hey dude!"
 
-class Operation(Enum):
+
+@dataclass(frozen=True)
+class Operation:
     """
     Class which provides the possible endpoints for Freshchat API
     """
@@ -30,6 +32,13 @@ class FreshChatConfiguration:
     Class represents the basic URL configuration for Freshchat
     """
 
+    app_id: str = None
+    channel_id: str = None
+    headers: FreshChatHeaders = field(default_factory=FreshChatHeaders)
+
+    def __post_init__(self):
+        self.headers = FreshChatHeaders(self.headers.get("Authorization"))
+
     @property
     def url_prefix(self):
         if "ENV" in os.environ and os.environ["ENV"] == "TEST":
@@ -37,7 +46,7 @@ class FreshChatConfiguration:
         else:
             return f"https://api.freshchat.com/v2/users"
 
-    def get_url(self, *extras: str):
+    def get_url(self, *path: str):
         """
         Method responsible to build the url using the given extras if exists
 
@@ -46,10 +55,9 @@ class FreshChatConfiguration:
         """
         return (
             urljoin(
-                self.url_prefix,
-                "/".join(str(x) for x in extras).lstrip("/").lstrip("/"),
+                self.url_prefix, "/".join(str(x) for x in path).lstrip("/").lstrip("/")
             )
-            if extras
+            if path
             else self.url_prefix
         )
 
@@ -59,17 +67,14 @@ class FreshChatClient(LoggedObject):
     Class represents an HTTP client
     """
 
-    def __init__(
-        self, headers: FreshChatHeaders, config: FreshChatConfiguration
-    ) -> None:
-        self.headers = headers
+    def __init__(self, config: FreshChatConfiguration) -> None:
         self.config = config
 
     async def request(
         self,
         method: str,
-        operation: Operation,
-        url_extras: List = None,
+        operation: str,
+        path: Union[str, List] = None,
         params: Dict[AnyStr, Any] = None,
         body: Dict[AnyStr, Any] = None,
         headers: Dict[AnyStr, Any] = None,
@@ -78,21 +83,22 @@ class FreshChatClient(LoggedObject):
 
         :param method: http method can be GET or POST
         :param operation: URL variables
-        :param url_extras: URL extra variables
+        :param path: URL extra variables
         :param params: request parameters in the case of GET method
         :param body: request body in the case of POST method
         :param headers: extra headers
         :return: The response of the request using the above fields
         """
-
         request_headers = (
-            headers.update(asdict(self.headers)) if headers else asdict(self.headers)
+            headers.update(asdict(self.config.headers))
+            if headers
+            else asdict(self.config.headers)
         )
 
         url = (
-            self.config.get_url(operation.value, *url_extras)
-            if url_extras
-            else self.config.get_url(operation.value)
+            self.config.get_url(operation, *path)
+            if path
+            else self.config.get_url(operation)
         )
 
         self.logger.debug(
@@ -120,32 +126,29 @@ class FreshChatClient(LoggedObject):
 
     async def get(
         self,
-        operation: Operation,
-        url_extras: List = None,
+        operation: str,
+        path: Union[str, List] = None,
         params: Dict[AnyStr, Any] = None,
         headers: Dict[str, Any] = None,
     ) -> FreshChatResponse:
         """
         Method used for the get requests
+
         :param operation: URL variables
-        :param url_extras: URL extra variables
+        :param path: URL extra variables
         :param params: request parameters in the case of GET method
         :param headers: extra headers
         :return: The response of the request using the above fields
         :return: FreshChatResponse
         """
         return await self.request(
-            method="GET",
-            operation=operation,
-            url_extras=url_extras,
-            params=params,
-            headers=headers,
+            method="GET", operation=operation, path=path, params=params, headers=headers
         )
 
     async def post(
         self,
-        operation: Operation,
-        url_extras: List = None,
+        operation: str,
+        path: Union[str, List] = None,
         params: Dict[AnyStr, Any] = None,
         body: Dict[AnyStr, AnyStr] = None,
         headers: Dict[str, Any] = None,
@@ -153,7 +156,7 @@ class FreshChatClient(LoggedObject):
         """
         Method used for the post requests
         :param operation: URL variables
-        :param url_extras: URL extra variables
+        :param path: URL extra variables
         :param params: request parameters in the case of GET method
         :param body: request body in the case of POST method
         :param headers: extra headers
@@ -163,7 +166,7 @@ class FreshChatClient(LoggedObject):
         return await self.request(
             method="POST",
             operation=operation,
-            url_extras=url_extras,
+            path=path,
             params=params,
             body=body,
             headers=headers,

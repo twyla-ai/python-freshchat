@@ -1,10 +1,10 @@
 import functools
 from dataclasses import asdict, dataclass, field
-from typing import Any, AnyStr, Dict, List
+from typing import Any, AnyStr, Dict, List, Union
 
 from cafeteria.logging import LoggedObject
 
-from python.freshchat.client.client import FreshChatClient, Operation
+from python.freshchat.client.client import FreshChatClient
 
 
 @dataclass
@@ -34,11 +34,11 @@ class Message:
     created_time: str = None
     id: str = None
     app_id: str = None
-    actor_type: str = None
+    actor_type: str = "user"
     actor_id: str = None
     channel_id: str = None
     conversation_id: str = None
-    message_type: str = None
+    message_type: str = "normal"
     message_parts: List[Dict[AnyStr, AnyStr]] = field(default_factory=list)
 
 
@@ -51,7 +51,7 @@ class Conversation:
     conversation_id: str = None
     app_id: str = None
     channel_id: str = None
-    status: str = None
+    status: str = "new"
     agents: List[User] = field(default_factory=list)
     users: List[User] = field(default_factory=list)
     messages: List[Message] = field(default_factory=list)
@@ -111,33 +111,33 @@ class ModelManager(LoggedObject):
         self.client = client
 
     async def post(
-        self, operation: Operation, model: str, url_extras: List = None, **kwargs
+        self, operation: str, model: str, path: Union[str, List] = None, **kwargs
     ):
         """
 
         :param operation: URL variables
         :param model: a string represent which model should be used based on
         the operation
-        :param url_extras: URL extra variables
+        :param path: URL extra variables
         :param kwargs: a dictionary with the necessary field to initialize the model
         which will be the body of the request
         :return: the corresponding model
         """
         _model = functools.partial(self.models.get(model), **kwargs)
         response = await self.client.post(
-            operation=operation, url_extras=url_extras, body=asdict(_model())
+            operation=operation, path=path, body=asdict(_model())
         )
         return _model(**response.body)
 
-    async def get(self, operation: Operation, model: str, url_extras: List = None):
+    async def get(self, operation: str, model: str, path: Union[str, List] = None):
         """
 
         :param operation: URL variables
         :param model: a string represent which model should be used based on
         the operation
-        :param url_extras: URL extra variables
+        :param path: URL extra variables
         :return: the corresponding model
         """
-        response = await self.client.get(operation=operation, url_extras=url_extras)
+        response = await self.client.get(operation=operation, path=path)
         _model = functools.partial(self.models.get(model), **response.body)
         return _model()
