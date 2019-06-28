@@ -1,10 +1,5 @@
-import functools
-from dataclasses import asdict, dataclass, field
-from typing import Any, AnyStr, Dict, List, Union
-
-from cafeteria.logging import LoggedObject
-
-from python.freshchat.client.client import FreshChatClient
+from dataclasses import dataclass, field
+from typing import Any, AnyStr, Dict, List
 
 
 @dataclass
@@ -40,6 +35,10 @@ class Message:
     conversation_id: str = None
     message_type: str = "normal"
     message_parts: List[Dict[AnyStr, AnyStr]] = field(default_factory=list)
+
+    @classmethod
+    def create(cls, **kwargs):
+        return cls(**kwargs)
 
 
 @dataclass
@@ -96,48 +95,3 @@ class Channels:
     pagination: Dict[AnyStr, AnyStr] = field(default_factory=dict)
     links: Dict[AnyStr, AnyStr] = field(default_factory=dict)
     last_page: Dict[AnyStr, AnyStr] = field(default_factory=dict)
-
-
-class ModelManager(LoggedObject):
-    models = {
-        "User": User,
-        "Conversation": Conversation,
-        "Group": Group,
-        "Message": Message,
-        "Channels": Channels,
-    }
-
-    def __init__(self, client: FreshChatClient) -> None:
-        self.client = client
-
-    async def post(
-        self, operation: str, model: str, path: Union[str, List] = None, **kwargs
-    ):
-        """
-
-        :param operation: URL variables
-        :param model: a string represent which model should be used based on
-        the operation
-        :param path: URL extra variables
-        :param kwargs: a dictionary with the necessary field to initialize the model
-        which will be the body of the request
-        :return: the corresponding model
-        """
-        _model = functools.partial(self.models.get(model), **kwargs)
-        response = await self.client.post(
-            operation=operation, path=path, body=asdict(_model())
-        )
-        return _model(**response.body)
-
-    async def get(self, operation: str, model: str, path: Union[str, List] = None):
-        """
-
-        :param operation: URL variables
-        :param model: a string represent which model should be used based on
-        the operation
-        :param path: URL extra variables
-        :return: the corresponding model
-        """
-        response = await self.client.get(operation=operation, path=path)
-        _model = functools.partial(self.models.get(model), **response.body)
-        return _model()
