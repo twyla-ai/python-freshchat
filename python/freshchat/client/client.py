@@ -171,3 +171,6 @@ class FreshChatClient(LoggedObject):
             body=body,
             headers=headers,
         )
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}<{hex(id(self))}> (config={self.config})"

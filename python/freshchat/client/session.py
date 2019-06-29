@@ -4,6 +4,7 @@ from python.freshchat.client.client import (
     CONVERSATION_INITIAL_MESSAGE,
     FreshChatClient,
     Operation,
+    FreshChatConfiguration,
 )
 from python.freshchat.client.models import Conversation, Message, User
 
@@ -18,7 +19,13 @@ class SessionData:
 @dataclass
 class FreshChatSession:
     session_data: SessionData = field(default_factory=SessionData)
-    client: FreshChatClient = field(default_factory=FreshChatClient)
+    config: FreshChatConfiguration = field(default_factory=FreshChatConfiguration)
+
+    def __post_init__(self):
+        if isinstance(self.session_data, dict) and isinstance(self.config, dict):
+            self.session_data = SessionData(**self.session_data)
+            self.config = FreshChatConfiguration(**self.config)
+        self.client = FreshChatClient(self.config)
 
     async def create_user(self, **kwargs) -> User:
         response = await self.client.post(operation=Operation.USERS, body=kwargs)
