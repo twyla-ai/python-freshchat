@@ -22,13 +22,18 @@ class FreshChatSession:
     config: FreshChatConfiguration = field(default_factory=FreshChatConfiguration)
 
     def __post_init__(self):
-        if isinstance(self.session_data, dict) and isinstance(self.config, dict):
+        if isinstance(self.session_data, dict):
             self.session_data = SessionData(**self.session_data)
+
+        if isinstance(self.config, dict):
             self.config = FreshChatConfiguration(**self.config)
+
         self.client = FreshChatClient(self.config)
 
     async def create_user(self, **kwargs) -> User:
-        response = await self.client.post(operation=Operation.USERS, body=kwargs)
+        response = await self.client.post(
+            operation=Operation.USERS, body=asdict(User(**kwargs))
+        )
         user = User(**response.body)
         self.session_data.user_id = user.id
         return user
@@ -77,8 +82,8 @@ class FreshChatSession:
         )
         return Message(**response.body)
 
-    async def get_user(self) -> User:
+    async def get_user(self, user_id: str = None) -> User:
         response = await self.client.get(
-            Operation.USERS, path=[self.session_data.user_id]
+            Operation.USERS, path=[user_id] if user_id else self.session_data.user_id
         )
         return User(**response.body)
