@@ -41,6 +41,10 @@ class FreshChatForbidden(FreshChatClientException):
     DEFAULT_MESSAGE = "Access to the requested resource  is not permitted"
 
 
+class FreshChatNotAllowed(FreshChatClientException):
+    DEFAULT_MESSAGE = "Access to the requested resource  is not allowed"
+
+
 class FreshChatBadRequest(FreshChatClientException):
     DEFAULT_MESSAGE = (
         "Bad request, probably due to invalid syntax or missing required " "fields "
@@ -76,6 +80,7 @@ RESPONSE_CODE_TO_ERROR_MAPPING: Dict[int, Type[FreshChatClientException]] = {
     HTTPStatus.INTERNAL_SERVER_ERROR: ServerSideError,
     HTTPStatus.UNAUTHORIZED: FreshChatUnauthorised,
     HTTPStatus.FORBIDDEN: FreshChatForbidden,
+    HTTPStatus.METHOD_NOT_ALLOWED: FreshChatNotAllowed,
     HTTPStatus.TOO_MANY_REQUESTS: TooManyRequests,
     HTTPStatus.SERVICE_UNAVAILABLE: ServerUnavailable,
     HTTPStatus.CONFLICT: Conflict,
@@ -88,3 +93,10 @@ def raise_error_on_bad_response(response: FreshChatResponse) -> FreshChatRespons
         raise error(message=response.body, response=response.http)
     except KeyError:
         return response
+
+
+class HttpResponseCodeError:
+    def __new__(cls, code) -> FreshChatClientException:
+        print(code)
+        print(RESPONSE_CODE_TO_ERROR_MAPPING.get(code))
+        return RESPONSE_CODE_TO_ERROR_MAPPING.get(code, FreshChatClientException)()

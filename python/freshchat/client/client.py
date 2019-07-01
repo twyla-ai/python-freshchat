@@ -6,11 +6,13 @@ from urllib.parse import urljoin
 import aiohttp
 from cafeteria.logging import LoggedObject
 
-from python.freshchat.client.exceptions import raise_error_on_bad_response
+from python.freshchat.client.exceptions import HttpResponseCodeError
 from python.freshchat.client.headers import FreshChatHeaders
 from python.freshchat.client.responses import FreshChatResponse
 
-CONVERSATION_INITIAL_MESSAGE = "hey dude!"
+CONVERSATION_INITIAL_MESSAGE = os.environ.get(
+    "CONVERSATION_INITIAL_MESSAGE", "hey dude!"
+)
 
 
 @dataclass(frozen=True)
@@ -32,33 +34,30 @@ class FreshChatConfiguration:
     Class represents the basic URL configuration for Freshchat
     """
 
+    url: str = field(
+        default_factory=lambda: os.environ.get(
+            "FRESHCHAT_API_URL", "https://api.freshchat.com/v2/"
+        )
+    )
     app_id: str = None
     channel_id: str = None
     headers: FreshChatHeaders = field(default_factory=FreshChatHeaders)
 
     def __post_init__(self):
-        self.headers = FreshChatHeaders(self.headers.get("Authorization"))
-
-    @property
-    def url_prefix(self):
-        if "ENV" in os.environ and os.environ["ENV"] == "TEST":
-            return "http://127.0.0.1:8000/"
-        else:
-            return f"https://api.freshchat.com/v2/users"
+        if isinstance(self.headers, dict):
+            self.headers = FreshChatHeaders(self.headers.get("Authorization"))
 
     def get_url(self, *path: str):
         """
         Method responsible to build the url using the given extras if exists
 
-        :param extras: List with the extra variables for the url, ex. user/<user_id>
+        :param path: List with the extra variables for the url, ex. user/<user_id>
         :return: URL
         """
         return (
-            urljoin(
-                self.url_prefix, "/".join(str(x) for x in path).lstrip("/").lstrip("/")
-            )
+            urljoin(self.url, "/".join(str(x) for x in path).lstrip("/").lstrip("/"))
             if path
-            else self.url_prefix
+            else self.url
         )
 
 
@@ -109,6 +108,9 @@ class FreshChatClient(LoggedObject):
             headers,
             f"\n> body: {body}" if body else "",
         )
+        print(request_headers)
+        print(url)
+        print(method)
         async with aiohttp.ClientSession() as session:
             async with session.request(
                 method=method,
@@ -118,11 +120,15 @@ class FreshChatClient(LoggedObject):
                 headers=request_headers,
             ) as response:
                 response = await FreshChatResponse.load(response)
+                print(response.http.status)
+                print(response.body)
                 self.logger.debug(
                     "%s %s %d \n< %s", method, url, response.http.status, response.body
                 )
 
-                return raise_error_on_bad_response(response)
+                if 200 <= response.http.status < 300:
+                    return response
+                raise HttpResponseCodeError(response.http.status)
 
     async def get(
         self,

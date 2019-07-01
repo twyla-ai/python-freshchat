@@ -16,4 +16,3 @@ class FreshChatHeaders(LoggedObject):
 
     def __post_init__(self):
         self.Authorization = f"Bearer {self.Authorization}"
-        # self.headers.load()
