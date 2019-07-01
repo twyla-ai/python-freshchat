@@ -1,0 +1,70 @@
+version: 2.1
+jobs:
+  black:
+    docker:
+      - image: circleci/python:3.7
+    steps:
+      - checkout
+      - run:
+          name: ensure black
+          command: |
+            pip install --user black
+            ~/.local/bin/black --check ./python/freshchat ./tests
+
+  flake8:
+    docker:
+      - image: circleci/python:3.7
+    steps:
+      - checkout
+      - run:
+          name: ensure flake8
+          command: |
+            pip install --user flake8
+            ~/.local/bin/flake8 ./python/freshchat ./tests
+
+  test:
+    docker:
+      - image: circleci/python:3.7
+    steps:
+      - checkout
+      - run:
+          name: install dependencies
+          command: |
+            pip install --upgrade pip
+            pip install --user --upgrade poetry tox tox-venv
+      - run:
+          name: run tests
+          command: |
+            poetry run ~/.local/bin/tox
+
+  publish:
+    docker:
+      - image: circleci/python:3.7
+    steps:
+      - checkout
+      - run:
+          name: publish python wheel
+          command: |
+            pip install poetry
+            poetry config repositories.twyla $PYPI_REPO_URL
+            poetry config http-basic.twyla $PYPI_REPO_USERNAME $PYPI_REPO_PASSWORD
+            poetry publish --build -r twyla
+
+workflows:
+  version: 2
+  ci-checks:
+    jobs:
+      - black
+      - flake8
+      - test
+      - publish:
+            context: Build
+            requires:
+              - black
+              - flake8
+              - test
+            filters:
+              tags:
+                only: /^v.*/
+              branches:
+                ignore: /.*/
