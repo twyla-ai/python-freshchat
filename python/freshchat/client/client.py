@@ -108,9 +108,6 @@ class FreshChatClient(LoggedObject):
             headers,
             f"\n> body: {body}" if body else "",
         )
-        print(request_headers)
-        print(url)
-        print(method)
         async with aiohttp.ClientSession() as session:
             async with session.request(
                 method=method,
@@ -120,8 +117,6 @@ class FreshChatClient(LoggedObject):
                 headers=request_headers,
             ) as response:
                 response = await FreshChatResponse.load(response)
-                print(response.http.status)
-                print(response.body)
                 self.logger.debug(
                     "%s %s %d \n< %s", method, url, response.http.status, response.body
                 )

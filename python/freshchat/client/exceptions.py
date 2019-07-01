@@ -97,6 +97,4 @@ def raise_error_on_bad_response(response: FreshChatResponse) -> FreshChatRespons
 
 class HttpResponseCodeError:
     def __new__(cls, code) -> FreshChatClientException:
-        print(code)
-        print(RESPONSE_CODE_TO_ERROR_MAPPING.get(code))
         return RESPONSE_CODE_TO_ERROR_MAPPING.get(code, FreshChatClientException)()
