@@ -218,3 +218,58 @@ async def test_create_conversation(
     )
     conversation = await test_session.create_conversation(user=user)
     assert asdict(conversation) == output_data
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "message, json_body, output_data",
+    [
+        (
+            "Hello dude!",
+            {
+                "created_time": None,
+                "id": None,
+                "app_id": None,
+                "actor_id": "",
+                "actor_type": "user",
+                "channel_id": None,
+                "conversation_id": None,
+                "message_type": "normal",
+                "message_parts": [{"text": {"content": "Hello dude!"}}],
+            },
+            {
+                "created_time": "current_timestamp",
+                "id": "random_uuid",
+                "app_id": "",
+                "actor_id": "",
+                "actor_type": "user",
+                "channel_id": "",
+                "conversation_id": "random_uuid",
+                "message_type": "normal",
+                "message_parts": [{"text": {"content": "Hello dude!"}}],
+            },
+        )
+    ],
+)
+async def test_create_message(
+    message, json_body, output_data, test_session, mock_aioresponse
+):
+    output_data["app_id"] = test_session.config.app_id
+    output_data["channel_id"] = test_session.config.channel_id
+    output_data["actor_id"] = test_session.session_data.user_id
+    json_body["actor_id"] = test_session.session_data.user_id
+    output_data["conversation_id"] = test_session.session_data.conversation_id
+
+    def callback(_, **kwargs):
+        assert kwargs.get("json") == json_body
+
+    mock_aioresponse.post(
+        Operation.CONVERSATION
+        + "/"
+        + test_session.session_data.conversation_id
+        + "/messages",
+        payload=output_data,
+        callback=callback,
+    )
+    message_new = await test_session.create_message(message=message)
+    assert asdict(message_new) == output_data
