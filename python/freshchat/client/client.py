@@ -55,7 +55,11 @@ class FreshChatConfiguration:
         :return: URL
         """
         return (
-            urljoin(self.url, "/".join(str(x) for x in path).lstrip("/").lstrip("/"))
+            (
+                urljoin(self.url, "/".join((str(x) for x in path)).lstrip("/"))
+                if not isinstance(path, str)
+                else urljoin(self.url, path.lstrip("/"))
+            )
             if path
             else self.url
         )
@@ -95,7 +99,11 @@ class FreshChatClient(LoggedObject):
         )
 
         url = (
-            self.config.get_url(operation, *path)
+            (
+                self.config.get_url(operation, path)
+                if isinstance(path, str)
+                else self.config.get_url(operation, *path)
+            )
             if path
             else self.config.get_url(operation)
         )
