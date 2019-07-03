@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, AnyStr, Dict, List
+from typing import Any, AnyStr, Dict, List, ClassVar
 
 
 @dataclass
@@ -9,15 +9,20 @@ class User:
     agent
     """
 
-    id: str = None
-    created_time: str = None
-    email: str = None
-    first_name: str = None
-    last_name: str = None
-    phone: str = None
+    id: str = field(default=None)
+    created_time: str = field(default=None)
+    email: str = field(default=None)
+    first_name: str = field(default=None)
+    last_name: str = field(default=None)
+    phone: str = field(default=None)
     avatar: Dict[AnyStr, AnyStr] = field(default_factory=dict)
     social_profiles: List[Dict[AnyStr, AnyStr]] = field(default_factory=list)
     properties: List[Dict[AnyStr, AnyStr]] = field(default_factory=list)
+    endpoint: ClassVar[str] = field(default="/users", init=False)
+
+    @property
+    def get_endpoint(self):
+        return f"{self.endpoint}/{self.id}"
 
 
 @dataclass
@@ -26,19 +31,23 @@ class Message:
     Class which represents freshchat message format
     """
 
-    created_time: str = None
-    id: str = None
-    app_id: str = None
+    created_time: str = field(default=None)
+    id: str = field(default=None)
+    app_id: str = field(default=None)
     actor_type: str = "user"
-    actor_id: str = None
-    channel_id: str = None
-    conversation_id: str = None
+    actor_id: str = field(default=None)
+    channel_id: str = field(default=None)
+    conversation_id: str = field(default=None)
     message_type: str = "normal"
     message_parts: List[Dict[AnyStr, AnyStr]] = field(default_factory=list)
 
-    @classmethod
-    def create(cls, **kwargs):
-        return cls(**kwargs)
+    @property
+    def endpoint(self) -> str:
+        return f"/conversations/{self.conversation_id}/messages"
+
+    # @classmethod
+    # def create(cls, **kwargs):
+    #     return cls(**kwargs)
 
 
 @dataclass
@@ -47,13 +56,14 @@ class Conversation:
     Class which represents freshchat conversation format
     """
 
-    conversation_id: str = None
-    app_id: str = None
-    channel_id: str = None
-    status: str = "new"
+    conversation_id: str = field(default=None)
+    app_id: str = field(default=None)
+    channel_id: str = field(default=None)
+    status: str = field(default="new")
     agents: List[User] = field(default_factory=list)
     users: List[User] = field(default_factory=list)
     messages: List[Message] = field(default_factory=list)
+    endpoint: ClassVar[str] = field(default="/conversations", init=False)
 
 
 @dataclass
@@ -62,10 +72,10 @@ class Group:
     Class which represents freshchat group format
     """
 
-    id: str = None
-    name: str = None
-    description: str = None
-    routing_type: str = None
+    id: str = field(default=None)
+    name: str = field(default=None)
+    description: str = field(default=None)
+    routing_type: str = field(default=None)
 
 
 @dataclass
@@ -74,12 +84,12 @@ class Channel:
     Class which represents freshchat channel object
     """
 
-    id: str = None
+    id: str = field(default=None)
     icon: Dict[AnyStr, AnyStr] = field(default_factory=dict)
-    updated_time: str = None
-    enabled: bool = None
-    public: bool = None
-    name: str = None
+    updated_time: str = field(default=None)
+    enabled: bool = field(default=None)
+    public: bool = field(default=None)
+    name: str = field(default=None)
     tags: List[Any] = field(default_factory=list)
     welcome_message: Dict[Any, Any] = field(default_factory=dict)
 

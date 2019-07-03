@@ -1,12 +1,11 @@
 import urllib.parse
-from typing import AnyStr, Dict, Any
+from typing import Any, AnyStr, Dict
 from uuid import uuid4
 
 import pytest
 from aioresponses import aioresponses
 
 from python.freshchat.client.client import FreshChatClient, FreshChatConfiguration
-from python.freshchat.client.session import FreshChatSession
 
 BASE_URL = "http://127.0.0.1:8000/"
 
@@ -46,11 +45,7 @@ def auth_header():
 @pytest.fixture
 def test_config(auth_header) -> FreshChatConfiguration:
     return FreshChatConfiguration(
-        **{
-            "app_id": str(uuid4()),
-            "channel_id": str(uuid4()),
-            "headers": {"Authorization": auth_header},
-        }
+        **{"app_id": str(uuid4()), "channel_id": str(uuid4()), "token": auth_header}
     )
 
 
@@ -68,8 +63,3 @@ def session_data() -> Dict[AnyStr, Any]:
 @pytest.fixture
 def test_client(test_config) -> FreshChatClient:
     return FreshChatClient(config=test_config)
-
-
-@pytest.fixture
-def test_session(session_data, test_config) -> FreshChatSession:
-    return FreshChatSession(config=test_config, **session_data)

@@ -1,31 +1,18 @@
 import os
 from dataclasses import asdict, dataclass, field
-from typing import Any, AnyStr, Dict, List, Union
+from typing import Any, AnyStr, Dict
 from urllib.parse import urljoin
 
 import aiohttp
 from cafeteria.logging import LoggedObject
 
 from python.freshchat.client.exceptions import HttpResponseCodeError
-from python.freshchat.client.headers import FreshChatHeaders
+from python.freshchat.client.models import Conversation, Message, User
 from python.freshchat.client.responses import FreshChatResponse
 
 CONVERSATION_INITIAL_MESSAGE = os.environ.get(
     "CONVERSATION_INITIAL_MESSAGE", "hey dude!"
 )
-
-
-@dataclass(frozen=True)
-class Operation:
-    """
-    Class which provides the possible endpoints for Freshchat API
-    """
-
-    AGENTS = "/agents"
-    GROUPS = "/groups"
-    USERS = "/users"
-    CONVERSATION = "/conversations"
-    CHANNELS = "/channels"
 
 
 @dataclass
@@ -41,28 +28,24 @@ class FreshChatConfiguration:
     )
     app_id: str = None
     channel_id: str = None
-    headers: FreshChatHeaders = field(default_factory=FreshChatHeaders)
+    token: str = None
 
-    def __post_init__(self):
-        if isinstance(self.headers, dict):
-            self.headers = FreshChatHeaders(self.headers.get("Authorization"))
+    @property
+    def authorization_header(self) -> Dict[AnyStr, AnyStr]:
+        return {
+            "Authorization": f"Bearer {self.token}"
+            if "Bearer" not in self.token
+            else self.token
+        }
 
-    def get_url(self, *path: str):
+    def get_url(self, endpoint: str):
         """
         Method responsible to build the url using the given extras if exists
 
-        :param path: List with the extra variables for the url, ex. user/<user_id>
+        :param endpoint: List with the extra variables for the url, ex. user/<user_id>
         :return: URL
         """
-        return (
-            (
-                urljoin(self.url, "/".join((str(x) for x in path)).lstrip("/"))
-                if not isinstance(path, str)
-                else urljoin(self.url, path.lstrip("/"))
-            )
-            if path
-            else self.url
-        )
+        return urljoin(self.url, endpoint.lstrip("/"))
 
 
 class FreshChatClient(LoggedObject):
@@ -76,8 +59,7 @@ class FreshChatClient(LoggedObject):
     async def request(
         self,
         method: str,
-        operation: str,
-        path: Union[str, List] = None,
+        endpoint: str,
         params: Dict[AnyStr, Any] = None,
         body: Dict[AnyStr, Any] = None,
         headers: Dict[AnyStr, Any] = None,
@@ -85,28 +67,19 @@ class FreshChatClient(LoggedObject):
         """
 
         :param method: http method can be GET or POST
-        :param operation: URL variables
-        :param path: URL extra variables
+        :param endpoint: URL variables
         :param params: request parameters in the case of GET method
         :param body: request body in the case of POST method
         :param headers: extra headers
         :return: The response of the request using the above fields
         """
         request_headers = (
-            headers.update(asdict(self.config.headers))
+            headers.update(self.config.authorization_header)
             if headers
-            else asdict(self.config.headers)
+            else self.config.authorization_header
         )
 
-        url = (
-            (
-                self.config.get_url(operation, path)
-                if isinstance(path, str)
-                else self.config.get_url(operation, *path)
-            )
-            if path
-            else self.config.get_url(operation)
-        )
+        url = self.config.get_url(endpoint=endpoint)
 
         self.logger.debug(
             "%s %s \n> params: %s\n> headers: %s%s",
@@ -135,37 +108,33 @@ class FreshChatClient(LoggedObject):
 
     async def get(
         self,
-        operation: str,
-        path: Union[str, List] = None,
+        endpoint: str,
         params: Dict[AnyStr, Any] = None,
         headers: Dict[str, Any] = None,
     ) -> FreshChatResponse:
         """
         Method used for the get requests
 
-        :param operation: URL variables
-        :param path: URL extra variables
+        :param endpoint: URL variables
         :param params: request parameters in the case of GET method
         :param headers: extra headers
         :return: The response of the request using the above fields
         :return: FreshChatResponse
         """
         return await self.request(
-            method="GET", operation=operation, path=path, params=params, headers=headers
+            method="GET", endpoint=endpoint, params=params, headers=headers
         )
 
     async def post(
         self,
-        operation: str,
-        path: Union[str, List] = None,
+        endpoint: str,
         params: Dict[AnyStr, Any] = None,
         body: Dict[AnyStr, AnyStr] = None,
         headers: Dict[str, Any] = None,
     ) -> FreshChatResponse:
         """
         Method used for the post requests
-        :param operation: URL variables
-        :param path: URL extra variables
+        :param endpoint: URL variables
         :param params: request parameters in the case of GET method
         :param body: request body in the case of POST method
         :param headers: extra headers
@@ -173,13 +142,62 @@ class FreshChatClient(LoggedObject):
         :return: FreshChatResponse
         """
         return await self.request(
-            method="POST",
-            operation=operation,
-            path=path,
-            params=params,
-            body=body,
-            headers=headers,
+            method="POST", endpoint=endpoint, params=params, body=body, headers=headers
         )
+
+    async def create_user(self, **kwargs) -> User:
+        user = User(**kwargs)
+        response = await self.post(endpoint=user.endpoint, body=asdict(user))
+        user = User(**response.body)
+        return user
+
+    async def create_conversation(self, user: User) -> Conversation:
+        conversation_body = {
+            "app_id": self.config.app_id,
+            "channel_id": self.config.channel_id,
+            "users": [asdict(user)],
+            "messages": [
+                asdict(
+                    Message(
+                        **{
+                            "app_id": self.config.app_id,
+                            "actor_id": user.id,
+                            "channel_id": self.config.channel_id,
+                            "message_parts": [
+                                {"text": {"content": CONVERSATION_INITIAL_MESSAGE}}
+                            ],
+                        }
+                    )
+                )
+            ],
+        }
+        conversation = Conversation(**conversation_body)
+        response = await self.post(
+            endpoint=conversation.endpoint, body=asdict(conversation)
+        )
+        conversation = Conversation(**response.body)
+        return conversation
+
+    async def create_message(
+        self, conversation_id: str, user_id: str, message: str
+    ) -> Message:
+        message_model = Message(
+            **{
+                "conversation_id": conversation_id,
+                "actor_id": user_id,
+                "message_parts": [{"text": {"content": message}}],
+            }
+        )
+
+        response = await self.post(
+            endpoint=message_model.endpoint, body=asdict(message_model)
+        )
+        return Message(**response.body)
+
+    async def get_user(self, user_id: str = None) -> User:
+        user = User(id=user_id)
+        response = await self.get(user.get_endpoint)
+        return User(**response.body)
 
     def __repr__(self):
         return f"{self.__class__.__name__}<{hex(id(self))}> (config={self.config})"
