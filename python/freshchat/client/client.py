@@ -200,7 +200,8 @@ class FreshChatClient(LoggedObject):
         return User(**response.body)
 
     async def get_channels(self) -> Channels:
-        pass
+        response = await self.get(Channels().endpoint)
+        return Channels(**response.body)
 
     def __repr__(self):
         return f"{self.__class__.__name__}<{hex(id(self))}> (config={self.config})"
