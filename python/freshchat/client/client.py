@@ -7,7 +7,7 @@ import aiohttp
 from cafeteria.logging import LoggedObject
 
 from python.freshchat.client.exceptions import HttpResponseCodeError
-from python.freshchat.client.models import Conversation, Message, User
+from python.freshchat.client.models import Conversation, Message, User, Channels
 from python.freshchat.client.responses import FreshChatResponse
 
 CONVERSATION_INITIAL_MESSAGE = os.environ.get(
@@ -198,6 +198,9 @@ class FreshChatClient(LoggedObject):
         user = User(id=user_id)
         response = await self.get(user.get_endpoint)
         return User(**response.body)
+
+    async def get_channels(self) -> Channels:
+        pass
 
     def __repr__(self):
         return f"{self.__class__.__name__}<{hex(id(self))}> (config={self.config})"

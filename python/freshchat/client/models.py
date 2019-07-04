@@ -45,10 +45,6 @@ class Message:
     def endpoint(self) -> str:
         return f"/conversations/{self.conversation_id}/messages"
 
-    # @classmethod
-    # def create(cls, **kwargs):
-    #     return cls(**kwargs)
-
 
 @dataclass
 class Conversation:
@@ -105,3 +101,4 @@ class Channels:
     pagination: Dict[AnyStr, AnyStr] = field(default_factory=dict)
     links: Dict[AnyStr, AnyStr] = field(default_factory=dict)
     last_page: Dict[AnyStr, AnyStr] = field(default_factory=dict)
+    endpoint: ClassVar[str] = field(default="/channels", init=False)
