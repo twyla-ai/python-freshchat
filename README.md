@@ -1,5 +1,5 @@
-# A library provide a http client for Freshchat API
-Write your amazing description here
+# FreshChat Client
+A library provide a http client for Freshchat API 
 
 ## Installation
-`poetry install freshchat-liveagent-chat`
+`poetry install python-freshchat`
