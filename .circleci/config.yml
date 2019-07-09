@@ -51,20 +51,28 @@ jobs:
             poetry publish --build -r twyla
 
 workflows:
-  version: 2
+  version: 2.1
   ci-checks:
     jobs:
       - black
       - flake8
       - test
       - publish:
-            context: Build
-            requires:
-              - black
-              - flake8
-              - test
-            filters:
-              tags:
-                only: /^v.*/
-              branches:
-                ignore: /.*/
+          name: publish-pre-release-package
+          context: Build
+          requires:
+            - black
+            - flake8
+            - test
+          filters:
+            branches:
+              only:
+                - master
+      - publish:
+          name: publish-release-package
+          context: Build
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
