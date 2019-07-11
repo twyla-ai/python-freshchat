@@ -157,7 +157,6 @@ class Conversation:
                 "message_parts": [{"text": {"content": message}}],
             }
         )
-
         response = await client.post(
             endpoint=message_model.endpoint, json=asdict(message_model)
         )
