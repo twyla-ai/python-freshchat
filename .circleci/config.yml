@@ -3,6 +3,7 @@ jobs:
   black:
     docker:
       - image: circleci/python:3.7
+    resource_class: small
     steps:
       - checkout
       - run:
@@ -11,9 +12,10 @@ jobs:
             pip install --user black
             ~/.local/bin/black --check ./freshchat ./tests
 
-  flake8:
+  lint:
     docker:
       - image: circleci/python:3.7
+    resource_class: small
     steps:
       - checkout
       - run:
@@ -25,6 +27,7 @@ jobs:
   test:
     docker:
       - image: circleci/python:3.7
+    resource_class: small
     steps:
       - checkout
       - run:
@@ -35,11 +38,19 @@ jobs:
       - run:
           name: run tests
           command: |
-            poetry run ~/.local/bin/tox
+            ~/.local/bin/tox
+      - persist_to_workspace:
+          root: coverage
+          paths:
+            - html
+            - coverage.xml
+      - store_artifacts:
+          path: coverage
 
   publish:
     docker:
       - image: circleci/python:3.7
+    resource_class: small
     steps:
       - checkout
       - run:
@@ -51,23 +62,24 @@ jobs:
             poetry publish --build -r twyla
 
 workflows:
-  version: 2.1
   ci-checks:
     jobs:
       - black
-      - flake8
+      - lint
       - test
       - publish:
           name: publish-pre-release-package
           context: Build
           requires:
             - black
-            - flake8
+            - lint
             - test
           filters:
             branches:
               only:
                 - master
+  release:
+    jobs:
       - publish:
           name: publish-release-package
           context: Build
