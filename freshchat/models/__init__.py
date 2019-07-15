@@ -162,6 +162,11 @@ class Conversation:
         )
         return Message(**response.body)
 
+    async def resolve(self, client: FreshChatClient) -> Conversation:
+        status = {"status": "resolved"}
+        response = await client.put(endpoint=self.get_endpoint, json=status)
+        return Conversation(**response.body)
+
 
 @dataclass
 class Group:
