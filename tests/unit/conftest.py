@@ -34,7 +34,12 @@ def token():
 @pytest.fixture
 def test_config(token) -> FreshChatConfiguration:
     return FreshChatConfiguration(
-        **{"app_id": str(uuid4()), "default_channel_id": str(uuid4()), "token": token}
+        **{
+            "app_id": str(uuid4()),
+            "default_channel_id": str(uuid4()),
+            "token": token,
+            "public_key": "-----BEGIN RSA PUBLIC KEY-----*****-----END RSA PUBLIC KEY-----",
+        }
     )
 
 

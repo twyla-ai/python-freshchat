@@ -12,6 +12,7 @@ class FreshChatConfiguration:
 
     app_id: str
     token: str = field(repr=False)
+    public_key: str = field(repr=False)
     default_channel_id: Optional[str] = field(default=None)
     default_initial_message: Optional[str] = field(default=None)
     url: Optional[str] = field(
