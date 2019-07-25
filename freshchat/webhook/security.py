@@ -12,11 +12,11 @@ class SecurityManager:
 
     def key_parse(self) -> str:
         x = re.match(
-            "^-----BEGIN RSA PUBLIC KEY-----(.+)-----END RSA PUBLIC KEY-----$",
+            "^-----BEGIN RSA PUBLIC KEY-----((.+)|\n(.+)\n)-----END RSA PUBLIC KEY-----\n?$",
             self.public_key,
         )
         if x:
-            return x.group(1)
+            return x.group(1).strip()
         return None
 
     @property
