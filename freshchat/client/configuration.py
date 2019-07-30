@@ -7,7 +7,7 @@ from urllib.parse import urljoin
 @dataclass
 class FreshChatConfiguration:
     """
-    Class represents the basic URL configuration for Freshchat
+    Class represents the base configuration for Freshchat
     """
 
     app_id: str

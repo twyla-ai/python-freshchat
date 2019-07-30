@@ -85,6 +85,10 @@ class Conversation:
 
     @property
     def get_endpoint(self):
+        """
+        Property returns endpoint for the GET method
+        :return:
+        """
         return f"{self.endpoint}/{self.conversation_id}"
 
     @property
@@ -101,6 +105,12 @@ class Conversation:
     ) -> Conversation:
         """
         Create a new conversation instance
+        :param client: FreshChatClient to make the necessary requests
+        :param user_id: the id of the user who creates the conversation
+        :param channel_id: the id of the channel which the conversation will be assigned
+        :param init_message: the initial message of the conversation
+        :return: an instance of the class with the additional information returned from
+        Freshchat API
         """
         user = await User().get(client=client, user_id=user_id)
         conversation_body = {
@@ -136,7 +146,12 @@ class Conversation:
         cls, client: FreshChatClient, conversation_id: str, user_id: str
     ) -> Conversation:
         """
-        Return an existing conversation based on the conversation_id
+        Method which returns an existing conversation based on the conversation_id
+        :param client: FreshChatClient to make the necessary requests
+        :param conversation_id: the id of the conversation
+        :param user_id: the id of the user
+        :return: an instance of the class with the additional information returned from
+        Freshchat API
         """
 
         user = await User().get(client=client, user_id=user_id)
@@ -149,6 +164,10 @@ class Conversation:
     async def send(self, client: FreshChatClient, message: str) -> Message:
         """
         Sends a message to an existing conversation
+        :param client: FreshChatClient to make the necessary requests
+        :param message: message to be send in the  conversation
+        :return: am instance of the Message class with the additional information
+        returned from Freshchat API
         """
 
         message_model = Message(
@@ -164,6 +183,12 @@ class Conversation:
         return Message(**response.body)
 
     async def resolve(self, client: FreshChatClient) -> Conversation:
+        """
+        Method which resolves the existing Conversation
+        :param client: FreshChatClient to make the necessary requests
+        :return:  an instance of the class with the additional information returned from
+        Freshchat API
+        """
         status = {"status": "resolved"}
         response = await client.put(endpoint=self.get_endpoint, json=status)
         return Conversation(**response.body)
