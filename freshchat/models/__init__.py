@@ -96,8 +96,8 @@ class Conversation:
         cls,
         client: FreshChatClient,
         user_id: str,
-        channel_id: str,
-        init_message: str = None,
+        channel_id: Optional[str] = None,
+        init_message: Optional[str] = None,
     ) -> Conversation:
         """
         Create a new conversation instance
@@ -105,7 +105,7 @@ class Conversation:
         user = await User().get(client=client, user_id=user_id)
         conversation_body = {
             "app_id": client.config.app_id,
-            "channel_id": channel_id,
+            "channel_id": channel_id or client.config.default_channel_id,
             "users": [asdict(user)],
             "messages": [
                 asdict(
@@ -113,7 +113,8 @@ class Conversation:
                         **{
                             "app_id": client.config.app_id,
                             "actor_id": user.id,
-                            "channel_id": channel_id,
+                            "channel_id": channel_id
+                            or client.config.default_channel_id,
                             "message_parts": [{"text": {"content": init_message}}],
                         }
                     )
