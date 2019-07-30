@@ -10,6 +10,10 @@ FreshChatResponseBody = Union[str, Dict[AnyStr, Any]]
 
 
 class FreshChatResponse:
+    """
+    Class represent http response
+    """
+
     def __init__(
         self, response: ClientResponse, body: FreshChatResponseBody = None
     ) -> None:
@@ -18,10 +22,17 @@ class FreshChatResponse:
 
     @property
     def http(self) -> ClientResponse:
+        """
+        Property returns aiohttp.ClientResponse
+        """
         return self._response
 
     @property
     def body(self) -> FreshChatResponseBody:
+        """
+        Property returns FreshChatResponseBody which can be either a String or a
+        Dictionary
+        """
         return self._body
 
     @staticmethod
@@ -33,6 +44,10 @@ class FreshChatResponse:
 
     @classmethod
     async def load(cls, response: ClientResponse) -> FreshChatResponse:
+        """
+        Class method creates and returns an instance of the class given
+        an aiohttp.ClientResponse
+        """
         if response.content_type != "application/json":
             return cls(response, await response.text())
         return cls(response, await response.json(loads=cls._decode))

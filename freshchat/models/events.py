@@ -9,7 +9,7 @@ from freshchat.models import Conversation, Actor
 @dataclass
 class Message:
     """
-    Class which represents freshchat message format
+    Class which represents freshchat new message event
     """
 
     created_time: str = field(default=None)
@@ -38,7 +38,7 @@ class Message:
 @dataclass
 class Reopen:
     """
-    Class which represents freshchat message format
+    Class which represents freshchat conversation reopen event
     """
 
     reopener: str = field(default=None)
@@ -53,7 +53,7 @@ class Reopen:
 @dataclass
 class Resolve:
     """
-    Class which represents freshchat message format
+    Class which represents freshchat conversation resolve event
     """
 
     resolver: str = field(default=None)
@@ -67,6 +67,11 @@ class Resolve:
 
 @dataclass
 class IncomingEvent:
+    """
+    Class which accepts an incoming event and based on the type creates the
+    corresponding event
+    """
+
     actor: Actor = field(default_factory=Actor)
     action: str = field(default=None)
     action_time: str = field(default=None)
