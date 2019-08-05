@@ -48,7 +48,7 @@ pycrypto = "^2.6"
 pytest-cov = "^2.7"
 
 [tool.poetry.dev-dependencies]
-pre-commit = "^1.11"
+pre-commit = "^1.18"
 flake8 = "^3.5"
 coverage = "^4.5"
 black = "^19.3b0"
