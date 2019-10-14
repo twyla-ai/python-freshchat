@@ -3,7 +3,6 @@
 [![image](https://img.shields.io/pypi/pyversions/freshchat.svg)](https://pypi.org/project/freshchat/)
 [![image](https://readthedocs.org/projects/freshchat/badge/?version=latest&style=flat)](https://freshchat.readthedocs.io/)
 [![image](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
-
 [![](https://github.com/twyla-ai/python-freshchat/workflows/Main%20Workflow/badge.svg)](https://github.com/twyla-ai/python-freshchat/actions)
 [![Sonarcloud Status](https://sonarcloud.io/api/project_badges/measure?project=twyla-ai_python-freshchat&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.lapots.breed.judge:judge-rule-engine)
 [![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=twyla-ai/python-freshchat)](https://dependabot.com)
