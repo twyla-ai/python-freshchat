@@ -38,7 +38,7 @@ jobs:
       - run:
           name: run tests
           command: |
-            ~/.local/bin/tox
+            ~/.local/bin/tox -e py37
       - persist_to_workspace:
           root: coverage
           paths:
