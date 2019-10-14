@@ -28,9 +28,10 @@ packages = [
 version = "0.4.1-alpha.0"
 description = "A library provide a http client for Freshchat API"
 authors = [
-    "Twyla Engineering <software@twyla.ai>"
+    "Twyla Engineering <software@twyla.ai>",
+    "Maria Soulountsi <mariasoul01@gmail.com>"
 ]
-license = "Proprietary"
+license = "MIT"
 
 readme = "README.md"
 
