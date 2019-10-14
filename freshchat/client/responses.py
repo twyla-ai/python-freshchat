@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import json
 from json import JSONDecodeError
 from typing import Union, Dict, AnyStr, Any
@@ -43,7 +41,7 @@ class FreshChatResponse:
             return body
 
     @classmethod
-    async def load(cls, response: ClientResponse) -> FreshChatResponse:
+    async def load(cls, response: ClientResponse) -> "FreshChatResponse":
         """
         Class method creates and returns an instance of the class given
         an aiohttp.ClientResponse

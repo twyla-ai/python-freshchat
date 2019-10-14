@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from dataclasses import asdict, dataclass, field
 from typing import Any, AnyStr, Dict, List
 
@@ -25,7 +23,7 @@ class Message:
             self.conversation = Conversation(**self.conversation)
 
     @classmethod
-    def create(cls, incoming_message: Dict[AnyStr, AnyStr]) -> Message:
+    def create(cls, incoming_message: Dict[AnyStr, AnyStr]) -> "Message":
         conversation = Conversation(
             conversation_id=incoming_message.pop("conversation_id"),
             channel_id=incoming_message.pop("channel_id"),
