@@ -16,7 +16,7 @@ A python client library for [Freshchat (Live Chat Software)](https://www.freshwo
 This library can also be used to build B2B or C2B live chat clients integrating with the Freshchat API.
 
 ## Installation
-`poetry install freshchat`
+`pip install freshchat`
 
 ## Documentation
 The project documentation is available [here](https://freshchat.readthedocs.io/en/latest/). Be sure to check out the [introduction](https://freshchat.readthedocs.io/en/latest/intro.html) for usage examples.
