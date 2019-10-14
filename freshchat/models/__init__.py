@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from dataclasses import dataclass, field, asdict
 from typing import Any, AnyStr, Dict, List, ClassVar, Optional
 
@@ -29,7 +27,7 @@ class User:
         return f"{self.endpoint}/{self.id}"
 
     @classmethod
-    async def create(cls, client: FreshChatClient, **kwargs) -> User:
+    async def create(cls, client: FreshChatClient, **kwargs) -> "User":
         """
         Creates a new user instance with the given kwargs
         """
@@ -38,7 +36,7 @@ class User:
         return cls(**response.body)
 
     @classmethod
-    async def get(cls, client: FreshChatClient, user_id: str) -> User:
+    async def get(cls, client: FreshChatClient, user_id: str) -> "User":
         """
         Returns an existing user based on the given user_id
         """
@@ -102,7 +100,7 @@ class Conversation:
         user_id: str,
         channel_id: Optional[str] = None,
         init_message: Optional[str] = None,
-    ) -> Conversation:
+    ) -> "Conversation":
         """
         Create a new conversation instance
         :param client: FreshChatClient to make the necessary requests
@@ -144,7 +142,7 @@ class Conversation:
     @classmethod
     async def get(
         cls, client: FreshChatClient, conversation_id: str, user_id: str
-    ) -> Conversation:
+    ) -> "Conversation":
         """
         Method which returns an existing conversation based on the conversation_id
         :param client: FreshChatClient to make the necessary requests
@@ -182,7 +180,7 @@ class Conversation:
         )
         return Message(**response.body)
 
-    async def resolve(self, client: FreshChatClient) -> Conversation:
+    async def resolve(self, client: FreshChatClient) -> "Conversation":
         """
         Method which resolves the existing Conversation
         :param client: FreshChatClient to make the necessary requests
