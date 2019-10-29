@@ -52,7 +52,7 @@ dataclasses = { version = ">=0.6,<0.8", python = "~3.6" }
 pre-commit = "^1.18"
 flake8 = "^3.5"
 coverage = "^4.5"
-black = "^19.3b0"
+black = "^19.10b0"
 tox = "^3.14"
 pytest = "^5.1"
 aioresponses = "^0.6.1"
