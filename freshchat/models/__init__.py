@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field, asdict
-from typing import Any, AnyStr, Dict, List, ClassVar, Optional
+from typing import Any, AnyStr, Dict, List, ClassVar, Optional, Union
 
 from freshchat.client.client import FreshChatClient
 
@@ -159,22 +159,33 @@ class Conversation:
         conversation.users = [user]
         return conversation
 
-    async def send(self, client: FreshChatClient, message: str) -> Message:
+    async def send(
+        self,
+        client: FreshChatClient,
+        message: str,
+        **kwargs: Union[str, List[Dict[str, str]]],
+    ) -> Message:
         """
         Sends a message to an existing conversation
+
         :param client: FreshChatClient to make the necessary requests
         :param message: message to be send in the  conversation
+        :param kwargs: Additional message model properties to configure
         :return: am instance of the Message class with the additional information
         returned from Freshchat API
         """
+        message_parts = [
+            {"text": {"content": message}},
+            *kwargs.pop("message_parts", []),
+        ]
+        properties = {
+            "conversation_id": self.conversation_id,
+            "actor_id": self.user_id,
+            "message_parts": message_parts,
+        }
+        properties.update(kwargs)
 
-        message_model = Message(
-            **{
-                "conversation_id": self.conversation_id,
-                "actor_id": self.user_id,
-                "message_parts": [{"text": {"content": message}}],
-            }
-        )
+        message_model = Message(**properties)
         response = await client.post(
             endpoint=message_model.endpoint, json=asdict(message_model)
         )
