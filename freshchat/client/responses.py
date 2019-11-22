@@ -1,6 +1,6 @@
 import json
 from json import JSONDecodeError
-from typing import Union, Dict, AnyStr, Any
+from typing import Any, AnyStr, Dict, Union
 
 from aiohttp import ClientResponse
 
@@ -24,6 +24,10 @@ class FreshChatResponse:
         Property returns aiohttp.ClientResponse
         """
         return self._response
+
+    @property
+    def status(self) -> int:
+        return self.http.status
 
     @property
     def body(self) -> FreshChatResponseBody:
