@@ -63,7 +63,7 @@ class FreshChatClient(LoggedObject):
 
                 if 200 <= response.http.status < 300:
                     return response
-                raise HttpResponseCodeError(response.http.status)
+                raise HttpResponseCodeError(response)
 
     async def get(
         self,

@@ -1,9 +1,7 @@
 from http import HTTPStatus
 from typing import Dict, Type
 
-from aiohttp import ClientResponse
-
-from freshchat.client.responses import FreshChatResponseBody
+from freshchat.client.responses import FreshChatResponse
 
 
 class FreshChatClientException(Exception):
@@ -14,23 +12,23 @@ class FreshChatClientException(Exception):
 
     DEFAULT_MESSAGE = "Encountered a live agent client error"
 
-    def __init__(
-        self,
-        message: FreshChatResponseBody = None,
-        response: ClientResponse = None,
-        *args,
-    ) -> None:
-        message = message or self.DEFAULT_MESSAGE
+    def __init__(self, response: FreshChatResponse, *args,) -> None:
+        message: str = self.DEFAULT_MESSAGE
+        if isinstance(response.body, dict):
+            message = response.body.get("message")
+        elif isinstance(response.body, str):
+            message = response.body
+
         super().__init__(message, *args)
         self._message = message
         self._response = response
 
     @property
-    def message(self) -> FreshChatResponseBody:
+    def message(self) -> str:
         return self._message
 
     @property
-    def response(self) -> ClientResponse:
+    def response(self) -> FreshChatResponse:
         return self._response
 
 
@@ -141,5 +139,7 @@ class HttpResponseCodeError:
     Class responsible to return the proper exception based on the response status code
     """
 
-    def __new__(cls, code) -> FreshChatClientException:
-        return RESPONSE_CODE_TO_ERROR_MAPPING.get(code, FreshChatClientException)()
+    def __new__(cls, response: FreshChatResponse) -> FreshChatClientException:
+        return RESPONSE_CODE_TO_ERROR_MAPPING.get(
+            response.status, FreshChatClientException
+        )(response=response)
