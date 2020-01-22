@@ -1,5 +1,4 @@
 import json
-from json import JSONDecodeError
 from typing import Any, AnyStr, Dict, Union
 
 from aiohttp import ClientResponse
@@ -41,7 +40,7 @@ class FreshChatResponse:
     def _decode(body: str):
         try:
             return json.loads(body)
-        except JSONDecodeError:
+        except json.JSONDecodeError:
             return body
 
     @classmethod
