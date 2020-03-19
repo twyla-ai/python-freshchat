@@ -24,7 +24,7 @@ name = "freshchat"
 packages = [
     { include = "freshchat" },
 ]
-version = "0.5.0"
+version = "0.6.0-alpha.0"
 description = "A library provide a http client for Freshchat API"
 authors = [
     "Twyla Engineering <software@twyla.ai>",
