@@ -1,7 +1,7 @@
 from dataclasses import asdict, dataclass, field
-from typing import Any, AnyStr, Dict, List
+from typing import Any, AnyStr, Dict, List, Optional
 
-from freshchat.models import Conversation, Actor
+from freshchat.models import Actor, Conversation
 
 
 @dataclass
@@ -17,6 +17,7 @@ class Message:
     conversation: Conversation = field(default_factory=Conversation)
     message_type: str = field(default=None)
     message_parts: List[Dict[AnyStr, AnyStr]] = field(default_factory=list)
+    user_id: Optional[str] = field(default=None)
 
     def __post_init__(self):
         if isinstance(self.conversation, dict):
