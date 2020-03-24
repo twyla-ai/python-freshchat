@@ -203,7 +203,7 @@ description = "File identification library for Python"
 name = "identify"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,>=2.7"
-version = "1.4.11"
+version = "1.4.13"
 
 [package.extras]
 license = ["editdistance"]
@@ -533,7 +533,7 @@ description = "Virtual Python Environment builder"
 name = "virtualenv"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,>=2.7"
-version = "20.0.12"
+version = "20.0.13"
 
 [package.dependencies]
 appdirs = ">=1.4.3,<2"
@@ -559,7 +559,7 @@ description = "Measures number of Terminal column cells of wide-character codes"
 name = "wcwidth"
 optional = false
 python-versions = "*"
-version = "0.1.8"
+version = "0.1.9"
 
 [[package]]
 category = "main"
@@ -702,8 +702,8 @@ flake8 = [
     {file = "flake8-3.7.9.tar.gz", hash = "sha256:45681a117ecc81e870cbf1262835ae4af5e7a8b08e40b944a8a6e6b895914cfb"},
 ]
 identify = [
-    {file = "identify-1.4.11-py2.py3-none-any.whl", hash = "sha256:1222b648251bdcb8deb240b294f450fbf704c7984e08baa92507e4ea10b436d5"},
-    {file = "identify-1.4.11.tar.gz", hash = "sha256:d824ebe21f38325c771c41b08a95a761db1982f1fc0eee37c6c97df3f1636b96"},
+    {file = "identify-1.4.13-py2.py3-none-any.whl", hash = "sha256:a7577a1f55cee1d21953a5cf11a3c839ab87f5ef909a4cba6cf52ed72b4c6059"},
+    {file = "identify-1.4.13.tar.gz", hash = "sha256:ab246293e6585a1c6361a505b68d5b501a0409310932b7de2c2ead667b564d89"},
 ]
 idna = [
     {file = "idna-2.9-py2.py3-none-any.whl", hash = "sha256:a068a21ceac8a4d63dbfd964670474107f541babbd2250d61922f029858365fa"},
@@ -875,12 +875,12 @@ typing-extensions = [
     {file = "typing_extensions-3.7.4.1.tar.gz", hash = "sha256:091ecc894d5e908ac75209f10d5b4f118fbdb2eb1ede6a63544054bb1edb41f2"},
 ]
 virtualenv = [
-    {file = "virtualenv-20.0.12-py2.py3-none-any.whl", hash = "sha256:e5cf77b2db7d010f94a33b43fe2f390a0d0376b42530ef6fd1dd13af7355f003"},
-    {file = "virtualenv-20.0.12.tar.gz", hash = "sha256:d28ef00e313b22bc1d4712b4ae44b8abc9a11dcb137d0bc393c26532db0cb881"},
+    {file = "virtualenv-20.0.13-py2.py3-none-any.whl", hash = "sha256:87831f1070534b636fea2241dd66f3afe37ac9041bcca6d0af3215cdcfbf7d82"},
+    {file = "virtualenv-20.0.13.tar.gz", hash = "sha256:f3128d882383c503003130389bf892856341c1da12c881ae24d6358c82561b55"},
 ]
 wcwidth = [
-    {file = "wcwidth-0.1.8-py2.py3-none-any.whl", hash = "sha256:8fd29383f539be45b20bd4df0dc29c20ba48654a41e661925e612311e9f3c603"},
-    {file = "wcwidth-0.1.8.tar.gz", hash = "sha256:f28b3e8a6483e5d49e7f8949ac1a78314e740333ae305b4ba5defd3e74fb37a8"},
+    {file = "wcwidth-0.1.9-py2.py3-none-any.whl", hash = "sha256:cafe2186b3c009a04067022ce1dcd79cb38d8d65ee4f4791b8888d6599d1bbe1"},
+    {file = "wcwidth-0.1.9.tar.gz", hash = "sha256:ee73862862a156bf77ff92b09034fc4825dd3af9cf81bc5b360668d425f3c5f1"},
 ]
 yarl = [
     {file = "yarl-1.4.2-cp35-cp35m-macosx_10_13_x86_64.whl", hash = "sha256:3ce3d4f7c6b69c4e4f0704b32eca8123b9c58ae91af740481aa57d7857b5e41b"},
