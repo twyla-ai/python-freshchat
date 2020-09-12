@@ -12,7 +12,11 @@ class FreshChatClientException(Exception):
 
     DEFAULT_MESSAGE = "Encountered a live agent client error"
 
-    def __init__(self, response: FreshChatResponse, *args,) -> None:
+    def __init__(
+        self,
+        response: FreshChatResponse,
+        *args,
+    ) -> None:
         message: str = self.DEFAULT_MESSAGE
         if isinstance(response.body, dict):
             message = response.body.get("message")
@@ -105,18 +109,18 @@ class ResourceNotFound(FreshChatClientException):
 
 class ServerSideError(FreshChatClientException):
     """
-   Class inherits from FreshChatClientException represents Server Side Error exception
-   and sets DEFAULT_MESSAGE to `Something went wrong on the server side`
-   """
+    Class inherits from FreshChatClientException represents Server Side Error exception
+    and sets DEFAULT_MESSAGE to `Something went wrong on the server side`
+    """
 
     DEFAULT_MESSAGE = "Something went wrong on the server side"
 
 
 class Conflict(FreshChatClientException):
     """
-   Class inherits from FreshChatClientException represents Conflict exception
-   and sets DEFAULT_MESSAGE to `The request causes data inconsistencies`
-   """
+    Class inherits from FreshChatClientException represents Conflict exception
+    and sets DEFAULT_MESSAGE to `The request causes data inconsistencies`
+    """
 
     DEFAULT_MESSAGE = "The request causes data inconsistencies"
 

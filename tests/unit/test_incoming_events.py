@@ -2,7 +2,9 @@ from dataclasses import asdict
 
 import pytest
 
-from freshchat.models import Conversation, Message as OutgoingMessage, User
+from freshchat.models import Conversation
+from freshchat.models import Message as OutgoingMessage
+from freshchat.models import User
 from freshchat.models.events import IncomingEvent, Message, Reopen, Resolve
 
 
