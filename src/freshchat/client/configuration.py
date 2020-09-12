@@ -1,6 +1,6 @@
 import os
-from dataclasses import field, dataclass
-from typing import Optional, Dict, AnyStr
+from dataclasses import dataclass, field
+from typing import AnyStr, Dict, Optional
 from urllib.parse import urljoin
 
 

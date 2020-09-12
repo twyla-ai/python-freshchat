@@ -2,7 +2,7 @@ from dataclasses import asdict
 
 import pytest
 
-from freshchat.models import User, Conversation, Message
+from freshchat.models import Conversation, Message, User
 
 
 def message_init():

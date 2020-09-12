@@ -1,5 +1,5 @@
-from dataclasses import dataclass, field, asdict
-from typing import Any, AnyStr, Dict, List, ClassVar, Optional, Union
+from dataclasses import asdict, dataclass, field
+from typing import Any, AnyStr, ClassVar, Dict, List, Optional, Union
 
 from freshchat.client.client import FreshChatClient
 
