@@ -17,12 +17,12 @@ class SecurityManager:
 
     def key_parse(self) -> str:
         x = re.match(
-            "^-----BEGIN RSA PUBLIC KEY-----((.+)|\n(.+)\n)-----END RSA PUBLIC KEY-----\n?$",
+            "^-----BEGIN (RSA )?PUBLIC KEY-----((.+)|\n(.+)\n)-----END (RSA )?PUBLIC KEY-----\n?$",
             self.public_key,
         )
         if x:
-            return x.group(1).strip()
-        return None
+            return x.group(2).strip()
+        raise ValueError("Invalid public key")
 
     @property
     def rsa_key(self) -> RSA:
