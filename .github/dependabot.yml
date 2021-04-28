@@ -1,0 +1,55 @@
+version: 2
+registries:
+  python-index-nexus-eng-twyla-ai-repository-pypi-private-simple:
+    type: python-index
+    url: https://nexus.eng.twyla.ai/repository/pypi-private/simple
+    username: "${{secrets.PYTHON_INDEX_NEXUS_ENG_TWYLA_AI_REPOSITORY_PYPI_PRIVATE_SIMPLE_USERNAME}}"
+    password: "${{secrets.PYTHON_INDEX_NEXUS_ENG_TWYLA_AI_REPOSITORY_PYPI_PRIVATE_SIMPLE_PASSWORD}}"
+
+updates:
+- package-ecosystem: pip
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "04:00"
+  open-pull-requests-limit: 99
+  reviewers:
+  - mariasoul
+  ignore:
+  - dependency-name: black
+    versions:
+    - 21.4b0
+  - dependency-name: pytest-asyncio
+    versions:
+    - 0.15.0
+  - dependency-name: pre-commit
+    versions:
+    - 2.10.0
+    - 2.10.1
+    - 2.11.0
+    - 2.11.1
+    - 2.12.0
+  - dependency-name: flake8
+    versions:
+    - 3.8.4
+    - 3.9.0
+  - dependency-name: tox
+    versions:
+    - 3.21.2
+    - 3.21.3
+    - 3.21.4
+    - 3.22.0
+  - dependency-name: coverage
+    versions:
+    - "5.4"
+  - dependency-name: pytest
+    versions:
+    - 6.2.2
+  - dependency-name: aiohttp
+    versions:
+    - 3.7.3
+  - dependency-name: aioresponses
+    versions:
+    - 0.7.1
+  registries:
+  - python-index-nexus-eng-twyla-ai-repository-pypi-private-simple
